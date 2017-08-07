@@ -59,8 +59,8 @@ task wrapper(type: Wrapper) {
 
 remotes {
  webServer {
-    host = '192.168.1.20'
-    user = 'clement'
+    host = '10.161.86.13'
+    user = 'workcouncil'
     identity = file('id_rsa')
   }
  
@@ -77,7 +77,7 @@ task deploy << {
     session(remotes.webServer) {
       execute 'tomcat-8/bin/shutdown.sh'
       execute 'sleep 10'
-      put from: 'build/libs/rest-scheduler-ws.war', into: 'tomcat-8/webapps/tvscheduler.war'
+      put from: 'build/libs/wc-companion.war', into: 'tomcat-8/webapps/event-tracker.war'
       execute 'tomcat-8/bin/startup.sh'
     }
   }
