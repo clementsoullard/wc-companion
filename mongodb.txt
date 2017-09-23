@@ -4,3 +4,5 @@ db.log.aggregate( [
 ] )
 // Trouver tout les bon point qui ne sont pas encore consommés
  db.bonPoint.find({pointConsumed: {$ne: 0}});
+ 
+ db.event.aggregate([{$project: {_id:1, participations:1}},{$unwind: "$participations"},{$out: prout}])

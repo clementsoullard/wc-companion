@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,18 @@ import com.clement.eventtracker.dto.Event;
 import com.clement.eventtracker.dto.Participation;
 import com.clement.eventtracker.service.storage.StorageService;
 
+/**
+ * 
+ * @author Clement_Soullard
+ *
+ */
 @Component
 public class EventService {
 	@Autowired
 	EventRepository eventRepository;
+
+	@Autowired
+	ParticipationRepository participationRepository;
 
 	@Autowired
 	StorageService storageService;
@@ -57,20 +66,22 @@ public class EventService {
 	 */
 	public void registerEvent(String idEvent, Participation participation) {
 		Event event = eventRepository.findOne(idEvent);
+		participation.setEventId(new ObjectId(idEvent));
 		Date maxRegistrationDate = event.getDateMaxRegistration();
 		Date registrationDate = new Date();
 		participation.setRegistrationDate(registrationDate);
-
 		if (maxRegistrationDate != null && registrationDate.after(maxRegistrationDate)) {
 			participation.setInfamed(true);
 		}
-		event.addParticipation(participation);
-		eventRepository.save(event);
+		// event.addParticipation(participation);
+		participationRepository.save(participation);
+
 	}
 
 	public void unregisterEvent(String idEvent, String idParticipation) {
 		mongoTemplate.updateMulti(new Query(),
-				new Update().pull("participations", new Query(Criteria.where("id").is(idParticipation))), Event.class);
+				new Update().update("participations.$.cancelled", new Query(Criteria.where("id").is(idParticipation))),
+				Event.class);
 	}
 
 	/**
@@ -80,7 +91,8 @@ public class EventService {
 	public Event getEvent(String idEvent) {
 		Event event = eventRepository.findOne(idEvent);
 		Integer maxParticipants = event.getMaxParticipant();
-		List<Participation> participations = event.getParticipations();
+
+		List<Participation> participations = participationRepository.getParticipationByEventId(new ObjectId(idEvent));
 
 		/**
 		 * There is a sophisticated processing here, the reason what we count in
@@ -101,6 +113,7 @@ public class EventService {
 				}
 			});
 		}
+		event.setParticipations(participations);
 		/**
 		 * If the user register after the maximum particpant is reached, then it
 		 * is marked as infamed.

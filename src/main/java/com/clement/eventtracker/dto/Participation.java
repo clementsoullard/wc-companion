@@ -2,27 +2,29 @@ package com.clement.eventtracker.dto;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 public class Participation {
 
-	public String getIdr() {
-		return id;
-	}
-
 	@Id
 	private String id;
 
+	/** First name */
+
 	private String firstName;
+
+	/** Last name */
 
 	private String lastName;
 
+	/** Email */
+
 	private String email;
 
-	private String event;
+	/** */
+	private ObjectId eventId;
 
 	/**
 	 * Tracer used to identify if the submitssion is issued by the same person
@@ -32,16 +34,25 @@ public class Participation {
 	private boolean vegetarian;
 
 	private boolean employee;
-
+	/**
+	 * If the employee has not paid, of if he registered after the event has
+	 * reached the maximal number of participant.
+	 */
 	private boolean infamed;
 
 	private boolean paid;
 
 	private Date registrationDate;
 
+	/** The gender */
+
 	private String gender;
 
 	private String age;
+	/**
+	 * If the participation has been cancelled.
+	 */
+	private boolean cancelled;
 	/**
 	 * This is to store the additional questions
 	 */
@@ -59,12 +70,18 @@ public class Participation {
 		this.tracer = tracer;
 	}
 
-	public String getEvent() {
-		return event;
+	public String getIdr() {
+		return id;
 	}
 
-	public void setEvent(String event) {
-		this.event = event;
+	
+
+	public ObjectId getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(ObjectId eventId) {
+		this.eventId = eventId;
 	}
 
 	public String getAge() {
@@ -177,12 +194,20 @@ public class Participation {
 		this.paid = pay;
 	}
 
-	public HashMap<String,String> getQuestions() {
+	public HashMap<String, String> getQuestions() {
 		return questions;
 	}
 
-	public void setQuestions(HashMap<String,String> questions) {
+	public void setQuestions(HashMap<String, String> questions) {
 		this.questions = questions;
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
 	}
 
 }
